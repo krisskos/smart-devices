@@ -35,22 +35,18 @@ function fileWrite(a)
 	file.close()
 end
 function wipe()  
-cu=net.createConnection(net.UDP)
-cu:connect(target_port,target_ip)
-		cu:send('{"head":"","type": "SCT", "ip":"'..host_ip..'","port":"'..host_port..'","status":"termination"}') 
-		wifi.sta.disconnect()
-		wifi.sta.config("", "")
-		cntr=0
-		Red_led()
-		node.restart()
+	wifi.sta.disconnect()
+	wifi.sta.clearconfig()
+	cntr=0
+	Red_led()
+	node.restart()
 end
 function onChange () 
 if cntr<=12 then
 		cntr=cntr+1
 		tmr.delay(250000)
 elseif(check==1) then
-		check=0
-		
+		check=0		
 		wipe()
 	end
 end
@@ -75,7 +71,7 @@ function UdpStart()
 		function(data)
 			if data_old~=data then
 				cu:connect(target_port,target_ip)
-				cu:send('{"head":"","type":"SCT","data":"'..data..'","k1":"'..gpio.read(1)..'","k2":"'..gpio.read(2)..'","status":"ok"}')
+				cu:send('{"head":"","type":"SCT","data":"'..data..'","k1":"'..gpio.read(1)..'","k2":"'..gpio.read(2)..'"}')
 				data_old=data
 			end
 		end, 1)
@@ -140,13 +136,13 @@ tmr.alarm(0, 500, 1, function()
 			timer=0
 			timer2=0
 			once=1
-		elseif (wifi.sta.status()==1)or(wifi.sta.status()==4) then
+		elseif (wifi.sta.status()==1)or(wifi.sta.status()==4 or (wifi.sta.status()==3) then
 		    timer=timer+1
 			if timer==30 then
 			    timer=0
 				node.restart()
 			end
-		elseif (wifi.sta.status()==2) or (wifi.sta.status()==3) then
+		elseif (wifi.sta.status()==2) then
 		if blink==0 then
 			gpio.write(5,gpio.LOW)
 			blink=1
